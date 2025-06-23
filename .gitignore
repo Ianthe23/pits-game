@@ -1,0 +1,41 @@
+# .NET Core / API
+rest-api/bin/
+rest-api/obj/
+rest-api/logs/
+rest-api/*.db
+rest-api/*.db-shm
+rest-api/*.db-wal
+rest-api/appsettings.*.json
+!rest-api/appsettings.json
+!rest-api/appsettings.Development.json
+
+# React / Frontend
+web-client/node_modules/
+web-client/build/
+web-client/.env
+web-client/.env.local
+web-client/.env.production
+web-client/npm-debug.log*
+web-client/yarn-debug.log*
+web-client/yarn-error.log*
+
+# IDE / Editor
+.vscode/
+.vs/
+.idea/
+*.user
+*.suo
+*.userosscache
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Temp files
+*.tmp
+*.temp
+*~
