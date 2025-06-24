@@ -56,7 +56,9 @@ namespace RestAPI.Services
         {
             _logger.LogInformation("Making attempt for game ID: {GameId}, position: ({X}, {Y})", request.GameId, request.PositionX, request.PositionY);
 
-            var game = await _context.Games.Include(g => g.PitElements)
+            var game = await _context.Games
+                .Include(g => g.PitElements)
+                .Include(g => g.Player)
                 .FirstOrDefaultAsync(g => g.Id == request.GameId);
 
             if (game == null || game.IsCompleted)
@@ -73,28 +75,32 @@ namespace RestAPI.Services
                 PositionX = request.PositionX,
                 PositionY = request.PositionY,
                 IsPitElement = pitMove != null,
-                IsWinningMove = pitMove == null && request.PositionX == 3,
+                IsWinningMove = pitMove == null, // Winning move is when you DON'T hit a pit
             };
 
             _context.GameAttempts.Add(attempt);
 
-            if (pitMove != null)
+            // Award points only if it's NOT a pit move
+            if (pitMove == null)
             {
-                game.Points += request.PositionX;
+                game.Points += request.PositionX + 1; // Points equal to the row number (0-based + 1)
             }
 
             _logger.LogInformation("Attempt made: {AttemptId}, isPitElement: {IsPitElement}, isWinningMove: {IsWinningMove}", attempt.Id, attempt.IsPitElement, attempt.IsWinningMove);
             
+            // Game finishes if: 1) Hit a pit (game over), or 2) Reached the last row (row 3) without hitting a pit (success)
             bool isFinishingMove = pitMove != null || request.PositionX == 3;
             if (isFinishingMove)
             {
                 game.IsCompleted = true;
                 game.EndTime = DateTime.UtcNow;
 
-                _logger.LogInformation("Game completed with ID: {GameId}", game.Id);
+                _logger.LogInformation("Game completed with ID: {GameId}, Hit pit: {HitPit}, Points: {Points}", game.Id, pitMove != null, game.Points);
             }
 
             await _context.SaveChangesAsync();
+
+            _logger.LogInformation("Current Points: {Points}", game.Points);
 
             var response = new AttemptResponse
             {
@@ -123,7 +129,7 @@ namespace RestAPI.Services
                 await _signalRService.NotifyGameCompleted(response.GameResult);
                 var updatedRanking = await GetRankingAsync();
                 await _signalRService.NotifyRankingsUpdate(updatedRanking);
-            };
+            }
 
             return response;
         }

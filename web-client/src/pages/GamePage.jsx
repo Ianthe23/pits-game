@@ -98,7 +98,12 @@ function GamePage() {
       );
       console.log("Attempt result:", result);
       setPoints(result.points);
-      if (result.gameCompleted) {
+      if (!result.isFinishingMove) {
+        setMessage(
+          `🎉 ${playerName} didn't hit the pit! You have ${result.points} points!`
+        );
+      }
+      if (result.isGameCompleted) {
         setMessage(
           `🎉 ${playerName} finished the game with ${result.points} points!`
         );
@@ -183,8 +188,12 @@ function GamePage() {
               <strong>Points:</strong> {gameResult.points}
             </p>
             <p>
-              <strong>Attempts:</strong>{" "}
-              {gameResult.isCompleted ? gameResult.pitElements : "N/A"}
+              <strong>Pit Elements:</strong>{" "}
+              {gameCompleted
+                ? gameResult.gameResult.pitElements
+                    .map((pit) => `${pit.positionX},${pit.positionY}`)
+                    .join(", ")
+                : "N/A"}
             </p>
           </div>
         )}

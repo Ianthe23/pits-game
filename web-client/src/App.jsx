@@ -6,10 +6,14 @@ import AdminPage from "./pages/AdminPage";
 function App() {
   return (
     <Router>
-      <div>
-        <nav>
-          <Link to="/">Play Game</Link>
-          <Link to="/admin">Admin</Link>
+      <div className="App">
+        <nav className="App-header">
+          <Link className="App-link" to="/">
+            Play Game
+          </Link>
+          <Link className="App-link" to="/admin">
+            Admin
+          </Link>
         </nav>
 
         <Routes>

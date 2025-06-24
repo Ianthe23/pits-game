@@ -4,7 +4,7 @@ import "../styles/AdminPage.css";
 
 const AdminPage = () => {
   const [pits, setPits] = useState([]);
-  const [gameId, setGameId] = useState(null);
+  const [gameId, setGameId] = useState("");
   const [newPit, setNewPit] = useState({ positionX: 0, positionY: 0 });
 
   useEffect(() => {
@@ -21,8 +21,8 @@ const AdminPage = () => {
   };
 
   const addPit = async () => {
-    if (!newPit.positionX || !newPit.positionY || !gameId) {
-      alert("Please enter both position X and Y and select a game");
+    if (!gameId || gameId.trim() === "") {
+      alert("Please enter a game ID!");
       return;
     }
 
@@ -30,7 +30,7 @@ const AdminPage = () => {
     const game = await axios.get(
       `http://localhost:5252/api/Admin/games/${gameId}`
     );
-    if (!game.data.isCompleted) {
+    if (game.isCompleted) {
       alert("Game is not completed");
       return;
     }
@@ -48,10 +48,9 @@ const AdminPage = () => {
     }
 
     try {
-      await axios.post(
-        `http://localhost:5252/api/Admin/pits?gameId=${gameId}`,
-        { positionX: newPit.positionX, positionY: newPit.positionY }
-      );
+      await axios.post(`http://localhost:5252/api/Admin/games/${gameId}/pits`, {
+        pits: [{ positionX: newPit.positionX, positionY: newPit.positionY }],
+      });
       setNewPit({ positionX: 0, positionY: 0 });
       loadPits();
       alert("Pit added successfully");

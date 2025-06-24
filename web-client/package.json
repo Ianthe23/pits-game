@@ -2,6 +2,7 @@
   "name": "web-client",
   "version": "0.1.0",
   "private": true,
+  "proxy": "http://localhost:5252",
   "dependencies": {
     "@microsoft/signalr": "^8.0.7",
     "@testing-library/dom": "^10.4.0",
